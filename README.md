@@ -2,7 +2,7 @@
 
 DocFlow AI is an AI data-entry automation platform. This repository currently contains the Sprint 1 foundation: a Next.js frontend, a FastAPI backend, PostgreSQL, and Docker Compose.
 
-No OCR, LLM, document processing, upload workflow, or extraction features are implemented in this foundation.
+The upload foundation is implemented. OCR, LLM, and document processing remain out of scope.
 
 ## Run locally
 
@@ -46,5 +46,8 @@ Use `docker compose down -v` only when you intentionally want to remove the loca
 
 - PostgreSQL is the initial application database.
 - The backend uses a small Psycopg connection helper; schemas and migrations will be introduced with the first persisted feature.
-- Docker creates a private named volume for future document storage. No file-upload endpoint exists yet.
+- `POST /documents` accepts a multipart `file`, `owner_user_id`, `document_type_id`, and `schema_id`. The legacy-compatible alias is `POST /documents/upload`.
+- Uploads accept PDF, PNG, and JPEG only, verify the file signature rather than trusting the declared MIME type, enforce a 10 MiB default limit, and record a SHA-256 checksum.
+- Original files use opaque keys in the private Docker volume; they are never exposed as public URLs. The database metadata is written only after storage succeeds, and the stored object is removed if metadata persistence fails.
+- Uploading does not queue or run OCR, LLM, or other processing.
 - The development credentials in .env.example are not suitable for deployment.

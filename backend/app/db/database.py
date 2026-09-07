@@ -29,6 +29,15 @@ def get_session_factory() -> sessionmaker[Session]:
     return sessionmaker(bind=get_engine(), autoflush=False, expire_on_commit=False)
 
 
+def get_db_session():
+    """Yield a request-scoped SQLAlchemy session."""
+    session = get_session_factory()()
+    try:
+        yield session
+    finally:
+        session.close()
+
+
 def check_database_connection() -> None:
     """Open a short PostgreSQL connection and verify it can execute a query."""
     database_url = get_settings().database_url
