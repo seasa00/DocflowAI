@@ -1,0 +1,56 @@
+name: docflow-ai
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-docflow}
+      POSTGRES_USER: ${POSTGRES_USER:-docflow}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-docflow_dev_password}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build:
+      context: ./backend
+    environment:
+      APP_ENV: ${APP_ENV:-development}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-docflow}:${POSTGRES_PASSWORD:-docflow_dev_password}@db:5432/${POSTGRES_DB:-docflow}
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "from urllib.request import urlopen; urlopen('http://localhost:8000/health')",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    ports:
+      - "8000:8000"
+    volumes:
+      - document_storage:/app/storage
+
+  web:
+    build:
+      context: ./frontend
+    depends_on:
+      api:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
+  document_storage:
