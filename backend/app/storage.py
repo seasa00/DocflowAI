@@ -26,6 +26,9 @@ class PrivateObjectStorage(Protocol):
     def put(self, key: str, source: BinaryIO) -> None:
         """Persist ``source`` under an opaque key, without making it public."""
 
+    def open(self, key: str) -> BinaryIO:
+        """Open a private object for reading.  The caller closes the stream."""
+
     def delete(self, key: str) -> None:
         """Remove a previously persisted object if it exists."""
 
@@ -69,6 +72,15 @@ class FilesystemPrivateStorage:
             self._path_for(key).unlink(missing_ok=True)
         except OSError as error:
             raise StorageError("could not remove private document") from error
+
+    def open(self, key: str) -> BinaryIO:
+        """Open an object without exposing its filesystem path to callers."""
+        try:
+            return self._path_for(key).open("rb")
+        except FileNotFoundError as error:
+            raise StorageError("private object does not exist") from error
+        except OSError as error:
+            raise StorageError("could not read private document") from error
 
     def _path_for(self, key: str) -> Path:
         path = PurePosixPath(key)
