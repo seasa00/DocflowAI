@@ -254,6 +254,7 @@ class ExtractionResult(TimestampMixin, Base):
     model: Mapped[str | None] = mapped_column(String(255))
     provider_metadata: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     prompt_version: Mapped[str] = mapped_column(String(100), nullable=False)
+    prompt_metadata: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     raw_candidate_output: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     mapped_data: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     evidence_map: Mapped[dict[str, Any] | None] = mapped_column(JSONB)

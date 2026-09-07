@@ -202,6 +202,7 @@ class ExtractionResultRead(ORMModel):
     model: str | None
     provider_metadata: dict[str, Any] | None
     prompt_version: str
+    prompt_metadata: dict[str, Any] | None
     raw_candidate_output: dict[str, Any] | None
     mapped_data: dict[str, Any] | None
     evidence_map: dict[str, list[EvidenceReference]] | None

@@ -2,8 +2,8 @@
 
 DocFlow AI is an AI data-entry automation platform. This repository currently contains the Sprint 1 foundation: a Next.js frontend, a FastAPI backend, PostgreSQL, and Docker Compose.
 
-The upload foundation and normalized OCR service are implemented. LLM extraction
-and background job orchestration remain out of scope.
+The upload foundation, normalized OCR service, and provider-neutral LLM invoice
+extraction service are implemented. Job dispatch remains out of scope.
 
 ## Run locally
 
@@ -53,4 +53,9 @@ Use `docker compose down -v` only when you intentionally want to remove the loca
 - Uploading does not queue or run OCR, LLM, or other processing. OCR is exposed
   as a worker-oriented service and stores a private, versioned page/block
   artifact for a later extraction stage.
+- The extraction worker boundary accepts any `LLMProvider`; OpenRouter is the
+  configured adapter today and a local adapter only needs to implement the same
+  `extract()` contract. Model output is parsed with Pydantic before a draft can
+  be persisted. Results retain provider/model details, token/timing metadata,
+  and the version plus digest of the prompt used.
 - The development credentials in .env.example are not suitable for deployment.

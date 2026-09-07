@@ -25,6 +25,10 @@ services:
       DATABASE_URL: postgresql://${POSTGRES_USER:-docflow}:${POSTGRES_PASSWORD:-docflow_dev_password}@db:5432/${POSTGRES_DB:-docflow}
       PRIVATE_STORAGE_PATH: /app/storage
       MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-10485760}
+      LLM_PROVIDER: ${LLM_PROVIDER:-openrouter}
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_MODEL: ${OPENROUTER_MODEL:-openai/gpt-4.1-mini}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
     depends_on:
       db:
         condition: service_healthy
